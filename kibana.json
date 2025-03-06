@@ -1,0 +1,14 @@
+{
+  "id": "kibanaPipes",
+  "version": "1.0.0",
+  "kibanaVersion": "kibana",
+  "owner": {
+    "name": "Sachin Frayne",
+    "githubTeam": ""
+  },
+  "description": "String editing for the Dev Tools Console Response",
+  "server": true,
+  "ui": false,
+  "requiredPlugins": ["navigation"],
+  "optionalPlugins": []
+}

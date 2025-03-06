@@ -1,0 +1,17 @@
+{
+  "name": "kibana_pipes",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "bootstrap": "yarn kbn bootstrap && yarn install",
+    "build": "yarn plugin-helpers build --kibana-version 8.17.2",
+    "dev": "yarn plugin-helpers dev --kibana-version 8.17.2",
+    "plugin-helpers": "node ../../scripts/plugin_helpers",
+    "kbn": "node ../../scripts/kbn",
+    "test": "npx jest"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "ts-jest": "^29.2.6"
+  }
+}
