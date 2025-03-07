@@ -1,36 +1,39 @@
 // TODO: Big clean up of this function is needed, the if statements are a mess
 // TODO: Consider decodeURIComponent before any other processing
 
-export function decode(url: string) {
-  url = url.endsWith('=') ? url.slice(0, -1) : url;
-  
-  const [, kibanaRequest] = url.split('?request=');
+export function parseKibanaRequest(kibanaRequest: string): [string, string, string] {
+  // Trim spaces around the pipe character
+  kibanaRequest = kibanaRequest
+    .split('|')
+    .map((part) => part.trim())
+    .join('|');
+
   let elasticRequest = kibanaRequest;
   let paramsPlusPipes = '';
   let elasticQueryString = '';
   let kibanaPipeCommand = '';
 
-  if (kibanaRequest.includes('%3F')) {
-    [elasticRequest, paramsPlusPipes] = kibanaRequest.split('%3F');
+  if (kibanaRequest.includes('?')) {
+    [elasticRequest, paramsPlusPipes] = kibanaRequest.split('?');
   }
 
-  if (!elasticRequest.startsWith('%2F')) {
+  if (!elasticRequest.startsWith('/')) {
     elasticRequest = '/' + elasticRequest;
   }
 
-  if (!paramsPlusPipes.includes('%7C')) {
+  if (!paramsPlusPipes.includes('|')) {
     elasticQueryString = paramsPlusPipes;
   }
 
-  if (paramsPlusPipes.includes('%7C')) {
-    const pipeParts = paramsPlusPipes.split('%7C');
+  if (paramsPlusPipes.includes('|')) {
+    const pipeParts = paramsPlusPipes.split('|');
     elasticQueryString = pipeParts.shift() || '';
     kibanaPipeCommand = pipeParts.join('|');
   }
 
-  if (!kibanaRequest.includes('%3F') && kibanaRequest.includes('%7C')) {
-    elasticRequest = kibanaRequest.split('%7C')[0];
-    let [, ...kibanaPipeCommandParts] = kibanaRequest.split('%7C');
+  if (!kibanaRequest.includes('?') && kibanaRequest.includes('|')) {
+    elasticRequest = kibanaRequest.split('|')[0];
+    let [, ...kibanaPipeCommandParts] = kibanaRequest.split('|');
     kibanaPipeCommand = kibanaPipeCommandParts.join('|');
   }
 
