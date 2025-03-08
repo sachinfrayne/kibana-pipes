@@ -1,5 +1,4 @@
 // TODO: Big clean up of this function is needed, the if statements are a mess
-// TODO: Consider decodeURIComponent before any other processing
 
 export function parseKibanaRequest(kibanaRequest: string): [string, string, string] {
   // Trim spaces around the pipe character

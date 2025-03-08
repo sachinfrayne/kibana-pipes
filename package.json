@@ -13,5 +13,8 @@
   "devDependencies": {
     "@types/jest": "^29.5.14",
     "ts-jest": "^29.2.6"
+  },
+  "dependencies": {
+    "fast-sort": "^3.4.1"
   }
 }
