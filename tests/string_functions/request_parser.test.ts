@@ -20,6 +20,12 @@ test('parse /_cat/tasks|sort', () => {
   expect(parsedKibanaRequest).toEqual(['/_cat/tasks', '', 'sort']);
 });
 
+test('parse /_cat/tasks|sort with pipe sort on a new line', () => {
+  const parsedKibanaRequest = parseKibanaRequest(`/_cat/tasks
+ | sort -r`);
+  expect(parsedKibanaRequest).toEqual(['/_cat/tasks', '', 'sort -r']);
+});
+
 test('parse with spaces /_cat/tasks | sort | sort', () => {
   const parsedKibanaRequest = parseKibanaRequest('/_cat/tasks | sort | sort');
   expect(parsedKibanaRequest).toEqual(['/_cat/tasks', '', 'sort|sort']);
@@ -51,6 +57,8 @@ test('parse /_cat/tasks?v&h=action,task_id|sort -r|sort', () => {
 });
 
 test('parse /_cat/tasks?v&h=action,task_id|sort -r|sort|sort', () => {
-  const parsedKibanaRequest = parseKibanaRequest('/_cat/tasks?v&h=action,task_id|sort -r|sort|sort');
+  const parsedKibanaRequest = parseKibanaRequest(
+    '/_cat/tasks?v&h=action,task_id|sort -r|sort|sort'
+  );
   expect(parsedKibanaRequest).toEqual(['/_cat/tasks', 'v&h=action,task_id', 'sort -r|sort|sort']);
 });

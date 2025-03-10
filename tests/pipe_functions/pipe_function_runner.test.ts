@@ -16,7 +16,7 @@ PbPgpFDVQ6WTRSfi6cMHDQ index1
 
 test('sed to change index to i via processKibanaPipes', () => {
   const processedKibanaPipes = processKibanaPipes(
-    "sed -e 's/index/i/'",
+    "sed -e 's/index/i/g'",
     `PbPgpFDVQ6WTRSfi6cMHDQ index1
 pwFuf4UtQp6EXi4_6Jt92w index2
 `,
@@ -28,10 +28,9 @@ pwFuf4UtQp6EXi4_6Jt92w i2
 `);
 });
 
-// HERE HERE
 test('reverse sort and then sed index to i via processKibanaPipes', () => {
   const processedKibanaPipes = processKibanaPipes(
-    "sort -r|sed -e 's/index/i/'",
+    "sort -r|sed -e 's/index/i/g'",
     `PbPgpFDVQ6WTRSfi6cMHDQ index1
 pwFuf4UtQp6EXi4_6Jt92w index2
 `,

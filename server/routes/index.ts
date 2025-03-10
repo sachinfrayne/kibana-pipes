@@ -39,6 +39,7 @@ async function getEsResponse(
       catHeader
     );
 
+    // TODO: ES responses that are not cat responses need JSON formatting
     return response.ok({
       body: modifiedResponse,
       headers: {
@@ -89,12 +90,13 @@ export function defineRoutes(router: IRouter, logger: Logger) {
       url = url.endsWith('=') ? url.slice(0, -1) : url;
       const [, kibanaRequest] = url.split('?request=');
 
-      logger.info("url: " + url)
+      logger.info('url: ' + url);
 
       return await getEsResponse(kibanaRequest, esClient, response, logger);
     }
   );
 
+  // TODO: must accept `+` and `%20` as spaces
   router.post(
     {
       path: '/api/kp',
@@ -112,7 +114,7 @@ export function defineRoutes(router: IRouter, logger: Logger) {
       const esClient = coreContext.elasticsearch.client.asCurrentUser;
 
       const kibanaRequest = request.body.request;
-      logger.info("request: " + kibanaRequest)
+      logger.info('request: ' + kibanaRequest);
 
       return await getEsResponse(kibanaRequest, esClient, response, logger);
     }
