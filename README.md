@@ -1,6 +1,6 @@
 # kibana_pipes
 
-Pipe Elasticsearch commands, especially _cat requests through bash style pipes
+Pipe Elasticsearch commands, especially `_cat` requests through bash style pipes in dev tools console
 
 ---
 
