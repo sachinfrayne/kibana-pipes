@@ -9,6 +9,9 @@ import type {
 import type { KibanaPipesPluginSetup, KibanaPipesPluginStart } from './types';
 import { defineRoutes } from './routes';
 
+export const PLUGIN_ID = 'kibanaPipes';
+export const PLUGIN_NAME = 'kibanaPipes';
+
 export class KibanaPipesPlugin implements Plugin<KibanaPipesPluginSetup, KibanaPipesPluginStart> {
   private readonly logger: Logger;
 
