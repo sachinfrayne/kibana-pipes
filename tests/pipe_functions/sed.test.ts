@@ -57,5 +57,3 @@ danger    index2a 11.4kb
 danger    index2b 11.4kb
 `);
 });
-
-// TODO: the replacement text cannot contain a space currently, need to fix that except when the string is part of a cat command

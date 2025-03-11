@@ -9,43 +9,56 @@ async function getEsResponse(
   response: KibanaResponseFactory,
   logger: Logger
 ) {
-  const [elasticRequestURLDecoded, elasticQueryStringURLDecoded, kibanaPipeCommandURLDecoded] =
+  const [elasticRequest, elasticQueryString, kibanaPipeCommand] =
     parseKibanaRequest(kibanaRequest);
 
   const method = 'GET';
-  var catHeader = false;
+  let catHeader = false;
+  let catCommand = false;
 
   try {
-    const elasticResponse = await esClient.transport.request({
-      path: elasticRequestURLDecoded,
+    let elasticResponse = await esClient.transport.request({
+      path: elasticRequest,
       method,
-      querystring: elasticQueryStringURLDecoded,
+      querystring: elasticQueryString,
     });
 
-    // TODO: find a better name for `preModifiedResponse`
-    let preModifiedResponse =
+    let elasticResponseString =
       typeof elasticResponse === 'string' ? elasticResponse : JSON.stringify(elasticResponse);
 
+    if (elasticRequest.startsWith('/_cat')) {
+      catCommand = true;
+    }
+
     if (
-      elasticQueryStringURLDecoded.startsWith('v') ||
-      elasticQueryStringURLDecoded.includes('&v')
+      elasticQueryString.startsWith('v') ||
+      elasticQueryString.includes('&v')
     ) {
       catHeader = true;
     }
 
     const modifiedResponse = processKibanaPipes(
-      kibanaPipeCommandURLDecoded,
-      preModifiedResponse,
-      catHeader
+      kibanaPipeCommand,
+      elasticResponseString,
+      catHeader,
+      catCommand
     );
 
-    // TODO: ES responses that are not cat responses need JSON formatting
-    return response.ok({
-      body: modifiedResponse,
-      headers: {
-        'Content-Type': 'text/plain',
-      },
-    });
+    if (elasticRequest.startsWith('/_cat')) {
+      return response.ok({
+        body: modifiedResponse,
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+      });
+    } else {
+      return response.ok({
+        body: modifiedResponse,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    }
   } catch (error) {
     logger.error(`Error in /api/kp: ${error.message}`);
     return response.customError({
@@ -56,19 +69,6 @@ async function getEsResponse(
 }
 
 export function defineRoutes(router: IRouter, logger: Logger) {
-  // TODO: Is it possible to grab any command that is meant for elasticsearch
-  // and run it through this plugin? this way we can have cleaner commands in
-  // dev tools
-  // e.g. GET _cat/tasks?human&v|sort+-r
-  // instead of
-  // GET kbn:/api/kp?request=/_cat/tasks?human&v|sort+-r
-
-  // TODO: explore if there is a way to have spaces in the request
-  // e.g. GET kbn:/api/kp?request=/_cat/tasks?human&v|sort -r
-  // instead of
-  // GET kbn:/api/kp?request=/_cat/tasks?human&v|sort%20-r
-  // Likely not without a new console shell
-
   router.get(
     {
       path: '/api/kp',
@@ -90,13 +90,10 @@ export function defineRoutes(router: IRouter, logger: Logger) {
       url = url.endsWith('=') ? url.slice(0, -1) : url;
       const [, kibanaRequest] = url.split('?request=');
 
-      logger.info('url: ' + url);
-
       return await getEsResponse(kibanaRequest, esClient, response, logger);
     }
   );
 
-  // TODO: must accept `+` and `%20` as spaces
   router.post(
     {
       path: '/api/kp',
@@ -113,8 +110,7 @@ export function defineRoutes(router: IRouter, logger: Logger) {
       const coreContext = await context.core;
       const esClient = coreContext.elasticsearch.client.asCurrentUser;
 
-      const kibanaRequest = request.body.request;
-      logger.info('request: ' + kibanaRequest);
+      const kibanaRequest = request.body.request.replace(/\+/g, ' ');
 
       return await getEsResponse(kibanaRequest, esClient, response, logger);
     }

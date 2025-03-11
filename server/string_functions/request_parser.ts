@@ -1,7 +1,4 @@
-// TODO: Big clean up of this function is needed, the if statements are a mess
-
 export function parseKibanaRequest(kibanaRequest: string): [string, string, string] {
-  // Trim spaces around the pipe character
   kibanaRequest = kibanaRequest
     .split('|')
     .map((part) => part.trim())
@@ -36,9 +33,5 @@ export function parseKibanaRequest(kibanaRequest: string): [string, string, stri
     kibanaPipeCommand = kibanaPipeCommandParts.join('|');
   }
 
-  const elasticRequestURLDecoded = decodeURIComponent(elasticRequest);
-  const elasticQueryStringURLDecoded = decodeURIComponent(elasticQueryString);
-  const kibanaPipeCommandURLDecoded = decodeURIComponent(kibanaPipeCommand);
-
-  return [elasticRequestURLDecoded, elasticQueryStringURLDecoded, kibanaPipeCommandURLDecoded];
+  return [elasticRequest, elasticQueryString, kibanaPipeCommand];
 }

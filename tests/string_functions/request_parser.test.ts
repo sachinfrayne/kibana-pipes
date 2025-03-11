@@ -62,3 +62,14 @@ test('parse /_cat/tasks?v&h=action,task_id|sort -r|sort|sort', () => {
   );
   expect(parsedKibanaRequest).toEqual(['/_cat/tasks', 'v&h=action,task_id', 'sort -r|sort|sort']);
 });
+
+test('parse /_cat/tasks?v&h=action,task_id|sed -e "s/STRING/SUBTITUTION STRING/" even though this is a cat command and will ultimately throw an error', () => {
+  const parsedKibanaRequest = parseKibanaRequest(
+    '/_cat/tasks?v&h=action,task_id|sed -e "s/STRING/SUBTITUTION STRING/"'
+  );
+  expect(parsedKibanaRequest).toEqual([
+    '/_cat/tasks',
+    'v&h=action,task_id',
+    'sed -e "s/STRING/SUBTITUTION STRING/"',
+  ]);
+});
