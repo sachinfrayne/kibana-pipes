@@ -1,38 +1,22 @@
-import { sort as fastSort } from 'fast-sort';
+export function sort(input: string, args: string[], catHeader: boolean): string {
+  const hasTrailingNewline = input.endsWith('\n');
+  const reverseOrder = args.includes('-r');
+  const ignoreCase = args.includes('-f');
 
-const sortOptions: { [key: string]: (line: string) => string } = {
-  '-r': (line: string) => line,
-  '-f': (line: string) => line.toLowerCase(),
-};
-
-const getSortFunction = (args: string[]) => {
-  let sortFn = (line: string) => line;
-
-  args.forEach((option) => {
-    if (sortOptions[option]) {
-      sortFn = sortOptions[option];
-    }
-  });
-
-  return sortFn;
-};
-
-export function sort(input: string, args: string[] = [], catHeader: boolean): string {
   const lines = input.split('\n');
-  let header = '';
-  let body: string[];
+  const header = catHeader ? lines.shift() : null;
 
-  if (catHeader) {
-    [header, ...body] = lines;
-  } else {
-    body = lines;
-  }
+  const sortedLines = lines
+    .filter((line) => line.trim() !== '')
+    .sort((a, b) => {
+      const aValue = ignoreCase ? a.toLowerCase() : a;
+      const bValue = ignoreCase ? b.toLowerCase() : b;
+      return reverseOrder ? bValue.localeCompare(aValue) : aValue.localeCompare(bValue);
+    })
+    .join('\n');
 
-  const sortFn = getSortFunction(args);
-  const sortedBody = fastSort(body).by([
-    { asc: (line) => (line === '' ? 1 : 0) },
-    args.includes('-r') ? { desc: sortFn } : { asc: sortFn },
-  ]);
-
-  return catHeader ? [header, ...sortedBody].join('\n') : sortedBody.join('\n');
+  const result = hasTrailingNewline
+    ? (header ? header + '\n' : '') + sortedLines + '\n'
+    : (header ? header + '\n' : '') + sortedLines;
+  return result;
 }
