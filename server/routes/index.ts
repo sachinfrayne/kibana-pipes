@@ -1,7 +1,7 @@
 import type { ElasticsearchClient, IRouter, KibanaResponseFactory } from '@kbn/core/server';
 import type { Logger } from '@kbn/core/server';
 import { processKibanaPipes } from '../pipe_functions/pipe_function_runner';
-import { parseKibanaRequest } from '../string_functions/request_parser';
+import { isCatRequest, hasCatHeader, parseKibanaRequest } from '../string_functions/request_parser';
 
 async function getEsResponse(
   kibanaRequest: string,
@@ -9,33 +9,22 @@ async function getEsResponse(
   response: KibanaResponseFactory,
   logger: Logger
 ) {
-  const [elasticRequest, elasticQueryString, kibanaPipeCommand] =
-    parseKibanaRequest(kibanaRequest);
+  const [elasticRequest, elasticQueryString, kibanaPipeCommand] = parseKibanaRequest(kibanaRequest);
 
   const method = 'GET';
-  let catHeader = false;
-  let catCommand = false;
 
   try {
-    let elasticResponse = await esClient.transport.request({
+    const elasticResponse = await esClient.transport.request({
       path: elasticRequest,
       method,
       querystring: elasticQueryString,
     });
 
-    let elasticResponseString =
+    const elasticResponseString =
       typeof elasticResponse === 'string' ? elasticResponse : JSON.stringify(elasticResponse);
 
-    if (elasticRequest.startsWith('/_cat')) {
-      catCommand = true;
-    }
-
-    if (
-      elasticQueryString.startsWith('v') ||
-      elasticQueryString.includes('&v')
-    ) {
-      catHeader = true;
-    }
+    const catCommand = isCatRequest(elasticRequest);
+    const catHeader = catCommand ? hasCatHeader(elasticQueryString) : false;
 
     const modifiedResponse = processKibanaPipes(
       kibanaPipeCommand,
@@ -44,7 +33,7 @@ async function getEsResponse(
       catCommand
     );
 
-    if (elasticRequest.startsWith('/_cat')) {
+    if (catCommand) {
       return response.ok({
         body: modifiedResponse,
         headers: {
@@ -85,9 +74,7 @@ export function defineRoutes(router: IRouter, logger: Logger) {
       const coreContext = await context.core;
       const esClient = coreContext.elasticsearch.client.asCurrentUser;
 
-      let url = request.url.toString();
-      url = decodeURIComponent(url);
-      url = url.endsWith('=') ? url.slice(0, -1) : url;
+      const url = decodeURIComponent(request.url.toString()).replace(/=$/, '');
       const [, kibanaRequest] = url.split('?request=');
 
       return await getEsResponse(kibanaRequest, esClient, response, logger);

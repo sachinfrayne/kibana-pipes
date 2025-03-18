@@ -1,3 +1,11 @@
+export function isCatRequest(elasticRequest: string) {
+  return elasticRequest.startsWith('/_cat');
+}
+
+export function hasCatHeader(elasticQueryString: string) {
+  return elasticQueryString.startsWith('v') || elasticQueryString.includes('&v');
+}
+
 export function parseKibanaRequest(kibanaRequest: string): [string, string, string] {
   kibanaRequest = kibanaRequest
     .split('|')
