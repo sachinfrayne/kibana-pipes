@@ -6,6 +6,11 @@ export function hasCatHeader(elasticQueryString: string) {
   return elasticQueryString.startsWith('v') || elasticQueryString.includes('&v');
 }
 
+export function getFormat(elasticQueryString: string) {
+  const match = elasticQueryString.match(/format=([^&]+)/);
+  return match ? match[1] : '';
+}
+
 export function parseKibanaRequest(kibanaRequest: string): [string, string, string] {
   kibanaRequest = kibanaRequest
     .split('|')

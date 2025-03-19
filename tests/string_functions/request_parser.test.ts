@@ -21,6 +21,18 @@ test('this does has a cat header', () => {
   expect(requestParser.hasCatHeader('h=index')).toEqual(false);
 });
 
+test('this has a json format ?format=json', () => {
+  expect(requestParser.getFormat('h=index&format=json&s=index')).toEqual('json');
+});
+
+test('this has a json format ?format=text', () => {
+  expect(requestParser.getFormat('h=index&format=text')).toEqual('text');
+});
+
+test('this has a json format ?format=yaml', () => {
+  expect(requestParser.getFormat('h=index&format=yaml')).toEqual('yaml');
+});
+
 test('parse _cat/tasks', () => {
   const parsedKibanaRequest = requestParser.parseKibanaRequest('_cat/tasks');
   expect(parsedKibanaRequest).toEqual(['/_cat/tasks', '', '']);
