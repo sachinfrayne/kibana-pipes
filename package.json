@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "bootstrap": "yarn kbn bootstrap && yarn install",
-    "build": "yarn plugin-helpers build --kibana-version 8.17.2",
-    "dev": "yarn plugin-helpers dev --kibana-version 8.17.2",
+    "build": "yarn plugin-helpers build",
+    "dev": "yarn plugin-helpers dev",
     "plugin-helpers": "node ../../scripts/plugin_helpers",
     "kbn": "node ../../scripts/kbn",
     "test": "npx jest"
@@ -14,5 +14,8 @@
     "@types/jest": "^29.5.14",
     "jest": "^29.7.0",
     "ts-jest": "^29.2.6"
+  },
+  "dependencies": {
+    "shell-quote": "^1.8.2"
   }
 }

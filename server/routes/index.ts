@@ -1,7 +1,12 @@
 import type { ElasticsearchClient, IRouter, KibanaResponseFactory } from '@kbn/core/server';
 import type { Logger } from '@kbn/core/server';
 import { processKibanaPipes } from '../pipe_functions/pipe_function_runner';
-import { isCatRequest, hasCatHeader, parseKibanaRequest } from '../string_functions/request_parser';
+import {
+  isCatRequest,
+  hasCatHeader,
+  getFormat,
+  parseKibanaRequest,
+} from '../string_functions/request_parser';
 
 async function getEsResponse(
   kibanaRequest: string,
@@ -11,12 +16,10 @@ async function getEsResponse(
 ) {
   const [elasticRequest, elasticQueryString, kibanaPipeCommand] = parseKibanaRequest(kibanaRequest);
 
-  const method = 'GET';
-
   try {
     const elasticResponse = await esClient.transport.request({
       path: elasticRequest,
-      method,
+      method: 'GET',
       querystring: elasticQueryString,
     });
 
@@ -25,6 +28,7 @@ async function getEsResponse(
 
     const catCommand = isCatRequest(elasticRequest);
     const catHeader = catCommand ? hasCatHeader(elasticQueryString) : false;
+    const format = getFormat(elasticQueryString);
 
     const modifiedResponse = processKibanaPipes(
       kibanaPipeCommand,
@@ -33,11 +37,18 @@ async function getEsResponse(
       catCommand
     );
 
-    if (catCommand) {
+    if (catCommand && (format === 'text' || format === '')) {
       return response.ok({
         body: modifiedResponse,
         headers: {
           'Content-Type': 'text/plain',
+        },
+      });
+    } else if (format === 'yaml') {
+      return response.ok({
+        body: modifiedResponse,
+        headers: {
+          'Content-Type': 'application/yaml',
         },
       });
     } else {

@@ -59,7 +59,7 @@ test('sed with a space in the arg sed -e "s/STRING/SUBSTITUTION STRING/" should 
   } catch (error) {
     expect(error.statusCode).toBe(400);
     expect(error.message).toBe(
-      "Invalid argument: Space character is not allowed in sed command arguments for /_cat requests {'s/STRING/SUBSTITUTION STRING/'}"
+      "Invalid argument: Space character is not allowed in sed command arguments for /_cat requests {s/STRING/SUBSTITUTION STRING/}"
     );
   }
 });
