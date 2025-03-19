@@ -15,8 +15,7 @@ export function sort(input: string, args: string[], catHeader: boolean): string 
     })
     .join('\n');
 
-  const result = hasTrailingNewline
+  return hasTrailingNewline
     ? (header ? header + '\n' : '') + sortedLines + '\n'
     : (header ? header + '\n' : '') + sortedLines;
-  return result;
 }
