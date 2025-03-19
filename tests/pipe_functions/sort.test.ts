@@ -1,4 +1,5 @@
 import { sort } from '../../server/pipe_functions/sort';
+import { test, expect } from '@jest/globals';
 
 test('sort _cat/indices without header', () => {
   const input = `green  index1 13.7kb

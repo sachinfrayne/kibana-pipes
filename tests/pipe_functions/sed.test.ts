@@ -1,4 +1,5 @@
 import { sed } from '../../server/pipe_functions/sed';
+import { test, expect } from '@jest/globals';
 
 test('sed _cat/indices to replace first green/yellow/red with good/ok/danger', () => {
   const input = `health index  store.size

@@ -1,4 +1,5 @@
 import * as requestParser from '../../server/string_functions/request_parser';
+import { test, expect } from '@jest/globals';
 
 test('this is a cat request', () => {
   expect(requestParser.isCatRequest('/_cat/indices?v')).toEqual(true);

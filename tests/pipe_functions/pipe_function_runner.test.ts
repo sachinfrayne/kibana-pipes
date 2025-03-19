@@ -1,4 +1,5 @@
 import { processKibanaPipes } from '../../server/pipe_functions/pipe_function_runner';
+import { test, expect } from '@jest/globals';
 
 test('reverse sort ignoring casing split via processKibanaPipes', () => {
   const processedKibanaPipes = processKibanaPipes(
