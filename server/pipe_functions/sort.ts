@@ -1,4 +1,19 @@
+import { badRequest } from '@hapi/boom';
+
+const acceptedArgs = ['-r', '-f'];
+
+function handleBadSortCommand(args: string[]) {
+  for (const arg of args) {
+    if (!acceptedArgs.includes(arg)) {
+      throw badRequest(`Invalid argument: sort command has no argument {${arg}}`).output.payload;
+    }
+  }
+}
+
 export function sort(input: string, args: string[], catHeader: boolean): string {
+  if (args.length > 0) {
+    handleBadSortCommand(args);
+  }
   const hasTrailingNewline = input.endsWith('\n');
   const reverseOrder = args.includes('-r');
   const ignoreCase = args.includes('-f');
